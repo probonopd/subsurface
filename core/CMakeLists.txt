@@ -21,7 +21,7 @@ endif()
 if(BTSUPPORT)
 	add_definitions(-DBT_SUPPORT)
 	set(BT_SRC_FILES desktop-widgets/btdeviceselectiondialog.cpp)
-	set(BT_CORE_SRC_FILES qtserialbluetooth.cpp)
+	set(BT_CORE_SRC_FILES qtserialbluetooth.cpp btdiscovery.cpp)
 endif()
 
 if(BLESUPPORT)
@@ -31,7 +31,6 @@ endif()
 
 # compile the core library, in C.
 set(SUBSURFACE_CORE_LIB_SRCS
-	btdiscovery.cpp
 	cochran.c
 	datatrak.c
 	deco.c
