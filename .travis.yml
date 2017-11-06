@@ -75,6 +75,7 @@ script:
 after_success:
     - ls -lh $APPIMAGE
     - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+    - echo $TRAVIS_TAG
     - bash -x ./upload.sh $APPIMAGE
 
 deploy:
