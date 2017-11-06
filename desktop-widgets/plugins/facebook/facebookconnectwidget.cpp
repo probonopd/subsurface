@@ -72,13 +72,16 @@ bool FacebookManager::loggedIn() {
 
 void FacebookManager::tryLogin(const QUrl& loginResponse)
 {
-	qCDebug(lcFacebook) << "Current url call" << loginResponse;
+	qCDebug(lcFacebook) << "tryLogin called with url" << loginResponse;
 	QString result = loginResponse.toString();
+	if (result.contains("error_description%3DPermissions%2Berror") && result.contains("error_reason%3Duser_denied")) {
+		qCDebug(lcFacebook) << "got user denied error" << result;
+		return;
+	}
 	if (!result.contains("access_token")) {
 		qCDebug(lcFacebook) << "Response without access token!";
 		return;
 	}
-
 	if (result.contains("denied_scopes=publish_actions") || result.contains("denied_scopes=user_photos")) {
 		qCDebug(lcFacebook) << "user did not allow us access" << result;
 		return;
@@ -165,7 +168,7 @@ void FacebookManager::facebookAlbumCreated()
 	} else {
 		qCDebug(lcFacebook) << "It was not possible to create the album with name" << fbInfo.albumName;
 		qCDebug(lcFacebook).noquote() << "Reply was: " << QString(albumsDoc.toJson(QJsonDocument::Indented));
-		// FIXME: we are lacking 'user_photos' facebook permission to create an album, 
+		// FIXME: we are lacking 'user_photos' facebook permission to create an album,
 		// but we are able to upload the image to Facebook (album will be named 'Subsurface Photos')
 		qCDebug(lcFacebook) << "But we are still able to upload data. Album name will be 'Subsurface Photos'";
 		auto fb = SettingsObjectWrapper::instance()->facebook;
@@ -300,7 +303,8 @@ void FacebookManager::uploadFinished()
 	emit sendDiveFinished();
 }
 
-FacebookConnectWidget::FacebookConnectWidget(QWidget *parent) : QDialog(parent), ui(new Ui::FacebookConnectWidget) {
+FacebookConnectWidget::FacebookConnectWidget(QWidget *parent) : QDialog(parent), ui(new Ui::FacebookConnectWidget)
+{
 	ui->setupUi(this);
 	FacebookManager *fb = FacebookManager::instance();
 #ifdef USE_WEBENGINE
@@ -325,6 +329,7 @@ FacebookConnectWidget::FacebookConnectWidget(QWidget *parent) : QDialog(parent),
 
 void FacebookConnectWidget::facebookLoggedIn()
 {
+	qCDebug(lcFacebook) << "Logged in to Facebook";
 	ui->fbWebviewContainer->hide();
 	ui->fbWebviewContainer->setEnabled(false);
 	ui->FBLabel->setText(tr("To disconnect Subsurface from your Facebook account, use the 'Share on' menu entry."));
@@ -333,7 +338,7 @@ void FacebookConnectWidget::facebookLoggedIn()
 
 void FacebookConnectWidget::facebookDisconnect()
 {
-	qCDebug(lcFacebook) << "Disconnecting from facebook";
+	qCDebug(lcFacebook) << "Disconnecting from Facebook";
 	// remove the connect/disconnect button
 	// and instead add the login view
 	ui->fbWebviewContainer->show();
