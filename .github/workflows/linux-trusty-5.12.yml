@@ -28,13 +28,11 @@ jobs:
         bash -x subsurface/.github/workflows/scripts/linux-in-container-build.sh
 
     - name: prepare PR artifacts
-      if: github.event_name == 'pull_request'
       run: |
         mkdir -p Linux-artifacts
         mv Subsurface.AppImage Linux-artifacts
 
     - name: PR artifacts
-      if: github.event_name == 'pull_request'
       uses: actions/upload-artifact@v3
       with:
         name: Linux-artifacts
